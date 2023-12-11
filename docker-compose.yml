@@ -1,0 +1,32 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:12
+    environment:
+      POSTGRES_DB: "labs"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+    ports:
+      - "6543:5432"
+
+  backend:
+    depends_on:
+    - postgres
+    ports:
+      - "8081:8081"
+    build:
+      context: ./
+      dockerfile: backend/Dockerfile
+      target: app
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/labs"
+
+  nginx:
+    depends_on:
+      - backend
+    build:
+      context: ./
+      dockerfile: nginx/Dockerfile
+    ports:
+      - 8080:8080
